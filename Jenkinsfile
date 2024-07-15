@@ -1,19 +1,19 @@
 pipeline {
   agent any
   environment {
-      repo_name = "${MicroServices}"
-      release_name = "${Release}"
+      repo_name="${MicroServices}"
+      release_name="${Release}"
       if ( "$release_name" == Stable ) {
-        branch_name = stable
+        branch_name=stable
       }
       if ( "$release_name" == Alpha ) {
-        branch_name = development
+        branch_name=development
       }
       if ( "$release_name" == Stable ) {
-        branch_name = pre-stable
+        branch_name=pre-stable
       }  
-      release_type = "${Release-Type}"
-      COSIGN_PASSWORD = credentials('78eadf7d-e1af-4058-ab98-d17f2a54839c')
+      release_type="${Release-Type}"
+      COSIGN_PASSWORD=credentials('78eadf7d-e1af-4058-ab98-d17f2a54839c')
   }
 
   stages {
