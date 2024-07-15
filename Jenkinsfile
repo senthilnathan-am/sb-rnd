@@ -9,6 +9,7 @@ pipeline {
   stages {
     stage('Git Pull') {
         steps {
+          script {
             if (params.Release == 'Stable') {
               branch_name=stable
             } else if ("Alpha".equals(${release_name})) {
@@ -25,6 +26,7 @@ pipeline {
             }
             sh 'mv ./wolf/Dockerfile Dockerfile && mv ./wolf/.dockerignore .dockerignore'
             sh 'ls -al'
+          }
         }
     }
   }
