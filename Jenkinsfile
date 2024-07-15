@@ -9,14 +9,12 @@ pipeline {
   stages {
     stage('Git Pull') {
         steps {
-            script {
             if (params.Release == 'Stable') {
               branch_name=stable
             } else if ("Alpha".equals(${release_name})) {
               branch_name=development
             } else if ("Stable".equals($release_name)) {
               branch_name=pre-stable
-            }
             }
             sh 'find . -type f -delete'
             dir('acs-connector') {
