@@ -9,15 +9,6 @@ pipeline {
   stages {
     stage('Git Pull') {
         steps {
-          script {
-            if ($release_name == 'Stable') {
-              branch_name=stable
-            } else if ("Alpha".equals(${release_name})) {
-              branch_name=development
-            } else if ("Stable".equals($release_name)) {
-              branch_name=pre-stable
-            }
-            sh 'find . -type f -delete'
             dir('acs-connector') {
               git(url: 'https://git.assistanz.com/stackbill/acs-connector.git', credentialsId: 'ebf87b99-0a18-4b01-a994-55c51a857e7b', branch: '$branch_name')
             }
@@ -26,7 +17,6 @@ pipeline {
             }
             sh 'mv ./wolf/Dockerfile Dockerfile && mv ./wolf/.dockerignore .dockerignore'
             sh 'ls -al'
-          }
         }
     }
   }
