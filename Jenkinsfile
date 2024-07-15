@@ -2,18 +2,19 @@ pipeline {
   agent any
   environment {
       repo_name="${MicroServices}"
-      release_name="${Release}"
-      if ( "$release_name" == Stable ) {
-        branch_name=stable
-      }
-      if ( "$release_name" == Alpha ) {
-        branch_name=development
-      }
-      if ( "$release_name" == Stable ) {
-        branch_name=pre-stable
-      }  
+      release_name=releaseName($Release) 
       release_type="${Release-Type}"
       COSIGN_PASSWORD=credentials('78eadf7d-e1af-4058-ab98-d17f2a54839c')
+  }
+
+  def releaseName(release) {
+    if ("Stable".equals(release)) {
+        branch_name=stable
+      } else if ("Alpha".equals(release)) {
+        branch_name=development
+      } else if ("Stable".equals(release)) {
+        branch_name=pre-stable
+      }
   }
 
   stages {
