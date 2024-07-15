@@ -12,7 +12,7 @@ pipeline {
       if ( "$release_name" == Stable ) {
         branch_name = pre-stable
       }  
-      release_type = "${Release Type}"
+      release_type = "${Release-Type}"
       COSIGN_PASSWORD = credentials('78eadf7d-e1af-4058-ab98-d17f2a54839c')
   }
 
