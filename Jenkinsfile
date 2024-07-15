@@ -4,12 +4,12 @@ pipeline {
       repo_name="${MicroServices}"
       release_name="${Release}"
       release_type="${Release-Type}"
+      branch_name=stable
   }
 
   stages {
     stage('Git Pull') {
         steps {
-            def branch_name=stable
             dir('acs-connector') {
               git(url: 'https://git.assistanz.com/stackbill/acs-connector.git', credentialsId: 'ebf87b99-0a18-4b01-a994-55c51a857e7b', branch: '$branch_name')
             }
