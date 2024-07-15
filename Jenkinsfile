@@ -1,19 +1,14 @@
-def branchName(release) {
-  if ( release == 'Stable') { return stable}
-}
 pipeline {
   agent any
   environment {
       repo_name="${MicroServices}"
-      release_name="${Release}"
+      branch_name="${Release}"
       release_type="${Release-Type}"
-      //branch_name="stable"
   }
 
   stages {
     stage('Git Clone') {
         steps {
-            branchName("$release_name")
             dir('acs-connector') {
               git(url: 'https://git.assistanz.com/stackbill/acs-connector.git', credentialsId: 'ebf87b99-0a18-4b01-a994-55c51a857e7b', branch: "${branch_name}")
             }
