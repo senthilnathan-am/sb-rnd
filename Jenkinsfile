@@ -4,7 +4,6 @@ pipeline {
       repo_name="${MicroServices}"
       release_name="${Release}"
       release_type="${Release-Type}"
-      COSIGN_PASSWORD=credentials('78eadf7d-e1af-4058-ab98-d17f2a54839c')
   }
 
   stages {
@@ -32,4 +31,4 @@ def releaseName(release) {
       } else if ("Stable".equals(release)) {
         branch_name=pre-stable
       }
-  }
+}
