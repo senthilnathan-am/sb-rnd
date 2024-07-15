@@ -10,7 +10,7 @@ pipeline {
     stage('Git Pull') {
         steps {
             //script {branch_name=releaseName(release_name)}
-            if ($release_name == Stable) {
+            if ("$release_name" == Stable) {
               branch_name=stable
             } else if ("Alpha".equals(${release_name})) {
               branch_name=development
