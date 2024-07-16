@@ -34,6 +34,22 @@ pipeline {
         }
     }
   }
+
+  stage('Maven Build') {
+        steps {
+            /** Maven Build **/
+            if ("${repo_name}" == "Core") {
+              sh '''
+                update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/bin/java
+                java -version && mvn -version
+                cd ./acs-connector/ && mvn clean install -U -DskipTests=true && cd ..
+                cp ./acs-connector/target/connectors-1.0.0-SNAPSHOT.jar ./wolf
+                cd ./wolf && mvn clean package -DskipTests=true
+              '''
+            }
+        }
+    }
+
   post { 
         success { 
             cleanWs()
