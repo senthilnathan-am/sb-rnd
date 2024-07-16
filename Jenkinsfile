@@ -40,7 +40,8 @@ pipeline {
           script {
             if ("${repo_name}" == "Core") {
               sh '''
-                update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/bin/java
+                #update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/bin/java
+                sudo unlink /etc/alternatives/java && sudo ln -sf /usr/lib/jvm/java-1.8.0-openjdk-amd64/bin/java /etc/alternatives/java
                 java -version && mvn -version
                 cd ./acs-connector/ && mvn clean install -U -DskipTests=true && cd ..
                 cp ./acs-connector/target/connectors-1.0.0-SNAPSHOT.jar ./wolf
