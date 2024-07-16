@@ -37,6 +37,7 @@ pipeline {
   stage('Maven Build') {
         steps {
             /** Maven Build **/
+          script {
             if ("${repo_name}" == "Core") {
               sh '''
                 update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/bin/java
@@ -46,6 +47,7 @@ pipeline {
                 cd ./wolf && mvn clean package -DskipTests=true
               '''
             }
+          }
         }
     }
   }
