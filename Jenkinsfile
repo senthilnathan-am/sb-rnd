@@ -70,11 +70,11 @@ pipeline {
         steps {
             script {
                 if(fileExists('/var/lib/jenkins/cosign/keys/artf.key')) {
-                    sh 'COSIGN_PASSWORD=$COSIGN_PASSWORD cosign sign-blob --key="/var/lib/jenkins/cosign/keys/artf.key" --output="/var/lib/jenkins/cosign/sign-files/artf" -y ./wolf/target/wolf-0.0.1-SNAPSHOT.jar'
+                    sh 'COSIGN_PASSWORD=$COSIGN_PASSWORD cosign sign-blob --key="/var/lib/jenkins/cosign/keys/artf.key" --output="/var/lib/jenkins/cosign/sign-files/artf" -y ./artifacts/*.jar'
                 }
                 else {
                     sh 'COSIGN_PASSWORD=$COSIGN_PASSWORD cosign generate-key-pair --output-key-prefix="/var/lib/jenkins/cosign/keys/artf"'
-                    sh 'COSIGN_PASSWORD=$COSIGN_PASSWORD cosign sign-blob --key="/var/lib/jenkins/cosign/keys/artf.key" --output="/var/lib/jenkins/cosign/sign-files/artf" -y ./wolf/target/wolf-0.0.1-SNAPSHOT.jar'
+                    sh 'COSIGN_PASSWORD=$COSIGN_PASSWORD cosign sign-blob --key="/var/lib/jenkins/cosign/keys/artf.key" --output="/var/lib/jenkins/cosign/sign-files/artf" -y ./artifacts/*.jar'
                 }
             }
         }
