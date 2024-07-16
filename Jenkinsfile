@@ -4,6 +4,7 @@ pipeline {
       repo_name="${MicroServices}"
       branch_name="${Release}"
       release_type="${Release-Type}"
+      COSING_PASSWORD=credentials('11aad1b0-d788-4813-ab4a-81fd4bbb7487')
   }
 
   stages {
@@ -41,7 +42,6 @@ pipeline {
             if ("${repo_name}" == "Core") {
               sh '''
                 sudo update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/bin/java
-                #sudo unlink /etc/alternatives/java && sudo ln -sf /usr/lib/jvm/java-1.8.0-openjdk-amd64/bin/java /etc/alternatives/java
                 java -version && mvn -version
                 cd ./acs-connector/ && mvn clean install -U -DskipTests=true && cd ..
                 cp ./acs-connector/target/connectors-1.0.0-SNAPSHOT.jar ./wolf
@@ -51,11 +51,25 @@ pipeline {
           }
         }
     }
-  }
 
-  post { 
-        success { 
-            cleanWs()
+    stage('Signing Artifact') {
+        steps {
+            script {
+                if(fileExists('/var/lib/jenkins/cosign/keys/artf.key')) {
+                    sh 'COSIGN_PASSWORD=$COSIGN_PASSWORD cosign sign-blob --key="/var/lib/jenkins/cosign/keys/artf.key" --output="/var/lib/jenkins/cosign/sign-files/artf" -y ./wolf/target/wolf-0.0.1-SNAPSHOT.jar'
+                }
+                else {
+                    sh 'COSIGN_PASSWORD=$COSIGN_PASSWORD cosign generate-key-pair --output-key-prefix="/var/lib/jenkins/cosign/keys/artf"'
+                    sh 'COSIGN_PASSWORD=$COSIGN_PASSWORD cosign sign-blob --key="/var/lib/jenkins/cosign/keys/artf.key" --output="/var/lib/jenkins/cosign/sign-files/artf" -y ./wolf/target/wolf-0.0.1-SNAPSHOT.jar'
+                }
+            }
         }
     }
+  }
+
+  #post { 
+        #success { 
+            #cleanWs()
+        #}
+    #}
 }
