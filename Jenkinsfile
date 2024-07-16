@@ -46,6 +46,7 @@ pipeline {
                 cd ./acs-connector/ && mvn clean install -U -DskipTests=true && cd ..
                 cp ./acs-connector/target/connectors-1.0.0-SNAPSHOT.jar ./wolf
                 cd ./wolf && mvn clean package -DskipTests=true
+                sudo update-alternatives --set java /usr/lib/jvm/java-17-openjdk-amd64/bin/java
               '''
             }
             if ("${repo_name}" == "Billing") {
@@ -55,6 +56,7 @@ pipeline {
                 cd ./acs-connector/ && mvn clean install -U -DskipTests=true && cd ..
                 cp ./acs-connector/target/connectors-1.0.0-SNAPSHOT.jar ./odolf
                 cd ./odolf && mvn clean package -DskipTests=true
+                sudo update-alternatives --set java /usr/lib/jvm/java-17-openjdk-amd64/bin/java
               '''
             }
           }
