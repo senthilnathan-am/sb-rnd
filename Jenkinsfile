@@ -83,10 +83,12 @@ pipeline {
     stage('S3 Upload') {
         steps {  
             /** Upload to S3**/
+          script {
             withAWS(region:'ap-south-1', credentials:'67917c46-3b5e-4cd1-91e9-9d4c3bb7f7de') {
                //def identity=awsIdentity();
                s3Upload(bucket:"stackbill-artifacts", workingDir: 'artifacts', includePathPattern:'*.jar');
             }
+          }
         }
     }
   }
