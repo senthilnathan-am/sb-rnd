@@ -4,7 +4,7 @@ pipeline {
       repo_name="${MicroServices}"
       branch_name="${Release}"
       release_type="${Release-Type}"
-      COSING_PASSWORD=credentials('11aad1b0-d788-4813-ab4a-81fd4bbb7487')
+      COSIGN_PASSWORD=credentials('11aad1b0-d788-4813-ab4a-81fd4bbb7487')
   }
 
   stages {
