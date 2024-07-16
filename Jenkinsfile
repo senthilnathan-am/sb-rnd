@@ -33,7 +33,6 @@ pipeline {
           }
         }
     }
-  }
 
   stage('Maven Build') {
         steps {
@@ -49,6 +48,7 @@ pipeline {
             }
         }
     }
+  }
 
   post { 
         success { 
