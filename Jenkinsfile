@@ -45,8 +45,10 @@ pipeline {
                 java -version && mvn -version
                 cd ./acs-connector/ && mvn clean install -U -DskipTests=true && cd ..
                 cp ./acs-connector/target/connectors-1.0.0-SNAPSHOT.jar ./wolf
-                cd ./wolf && mvn clean package -DskipTests=true
+                cd ./wolf && mvn clean package -DskipTests=true && cd ..
+                mkdir artifacts && cp ./wolf/target/*.jar artifacts/
                 sudo update-alternatives --set java /usr/lib/jvm/java-17-openjdk-amd64/bin/java
+
               '''
             }
             if ("${repo_name}" == "Billing") {
@@ -55,7 +57,8 @@ pipeline {
                 java -version && mvn -version
                 cd ./acs-connector/ && mvn clean install -U -DskipTests=true && cd ..
                 cp ./acs-connector/target/connectors-1.0.0-SNAPSHOT.jar ./odolf
-                cd ./odolf && mvn clean package -DskipTests=true
+                cd ./odolf && mvn clean package -DskipTests=true && cd ..
+                mkdir artifacts && cp ./odolf/target/*.jar artifacts/
                 sudo update-alternatives --set java /usr/lib/jvm/java-17-openjdk-amd64/bin/java
               '''
             }
@@ -75,6 +78,14 @@ pipeline {
                 }
             }
         }
+    }
+
+    stage('S3 Upload') {
+            /** Upload to S3**/
+            withAWS(region:'ap-south-1', credentials:'67917c46-3b5e-4cd1-91e9-9d4c3bb7f7de') {
+               def identity=awsIdentity();
+               s3Upload(bucket:"stackbill-artifacts", workingDir: 'artifacts', includePathPattern:'*.jar');
+            }
     }
   }
 
