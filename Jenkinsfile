@@ -2,8 +2,8 @@ pipeline {
   agent any
   environment {
       repo_name="${MicroServices}"
-      branch_name="${Release}"
-      release_type="${Release-Type}"
+      branch_name="${Branch}"
+      release_type="${Release}"
       COSIGN_PASSWORD=credentials('11aad1b0-d788-4813-ab4a-81fd4bbb7487')
       AWS_ACCESS_KEY = credentials('7a5f353a-4c21-491f-a4a6-cb4738f5b0a9') 
       AWS_SECRET_KEY = credentials('590a8e9b-8854-431e-817c-08faef36799d')
