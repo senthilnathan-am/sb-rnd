@@ -113,6 +113,7 @@ pipeline {
     stage('ECR Push') {
       steps {
         sh '''
+          #!/bin/bash
           aws configure set aws_access_key_id ${AWS_ACCESS_KEY}
           aws configure set aws_secret_access_key ${AWS_SECRET_KEY}
           aws ecr get-login-password --region ${AWS_REGION} | podman login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
