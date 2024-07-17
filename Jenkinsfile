@@ -120,6 +120,9 @@ pipeline {
             if [ "$branch_name" = "stable" ]; then
               if [ "$release_type" = "Major" ]; then
                 image_tag=$(aws ecr describe-images --repository-name stackbill-coreapi --query 'sort_by(imageDetails,& imagePushedAt)[*].imageTags[0]' | grep -v "alpha" | grep -v "beta" | awk 'NR==1{print $1}' | tr -d '"' | tr -d ',')
+              fi
+            fi
+          fi
         '''
       }
     }
