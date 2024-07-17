@@ -100,6 +100,7 @@ pipeline {
       steps {
         sh '''
           podman rmi --all
+          cp ./artifacts/*.jar .
           if [ "$repo_name" = "Core" ]; then
             podman build -t ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-coreapi .
           elif [ "$repo_name" = "Billing" ]; then
