@@ -120,7 +120,7 @@ pipeline {
           if [ "$repo_name" = "Core" ]; then
             if [ "$branch_name" = "stable" ]; then
               if [ "$release_type" = "Major" ]; then
-                image_tag=$(aws ecr describe-images --repository-name foo --query 'sort_by(imageDetails,& imagePushedAt)[*].imageTags[0]' | grep -v "alpha\|beta" | awk 'NR==1{print $1}' | tr -d '"' | tr -d ',')
+                image_tag=$(aws ecr describe-images --repository-name foo --query 'sort_by(imageDetails,& imagePushedAt)[*].imageTags[0]' | grep -v "alpha'\|'beta" | awk 'NR==1{print $1}' | tr -d '"' | tr -d ',')
         '''
       }
     }
