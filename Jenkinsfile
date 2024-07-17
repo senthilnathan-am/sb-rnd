@@ -5,6 +5,10 @@ pipeline {
       branch_name="${Release}"
       release_type="${Release-Type}"
       COSIGN_PASSWORD=credentials('11aad1b0-d788-4813-ab4a-81fd4bbb7487')
+      AWS_ACCESS_KEY = credentials('7a5f353a-4c21-491f-a4a6-cb4738f5b0a9') 
+      AWS_SECRET_KEY = credentials('590a8e9b-8854-431e-817c-08faef36799d')
+      AWS_REGION = credentials('efcaf984-bf4c-4f34-a84c-5f0438bfcdba')
+      AWS_ACCOUNT_ID = credentials('c620055a-b75b-40b2-a390-d780f977faa8')
   }
 
   stages {
@@ -90,6 +94,18 @@ pipeline {
             }
           }
         }
+    }
+
+    stage('Image Build') {
+      steps {
+        sh '''
+          podman rmi --all
+          if [ "$repo_name" = "Core" ]; then
+            podman build -t ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-coreapi .
+          elif [ "$repo_name" = "Billing" ]; then
+            podman build -t ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-coreapi .
+        '''
+      }
     }
   }
 
