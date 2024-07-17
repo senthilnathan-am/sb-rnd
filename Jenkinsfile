@@ -104,6 +104,7 @@ pipeline {
             podman build -t ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-coreapi .
           elif [ "$repo_name" = "Billing" ]; then
             podman build -t ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-coreapi .
+          fi
         '''
       }
     }
