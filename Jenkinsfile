@@ -115,7 +115,7 @@ pipeline {
         sh '''
           aws configure set aws_access_key_id ${AWS_ACCESS_KEY}
           aws configure set aws_secret_access_key ${AWS_SECRET_KEY}
-          aws configure region ${AWS_REGION}
+          aws configure set region ${AWS_REGION}
           aws ecr get-login-password --region ${AWS_REGION} | podman login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
           if [ "$repo_name" = "Core" ]; then
             if [ "$branch_name" = "stable" ]; then
