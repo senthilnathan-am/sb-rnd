@@ -237,7 +237,7 @@ pipeline {
           ### Pushing Billing Image to ECR ###
           if [ "$repo_name" = "billing" ]; then
             if [ "$branch_name" = "stable" ]; then
-              image_tag=$(aws ecr describe-images --repository-name stackbill-billing --query 'sort_by(imageDetails,& imagePushedAt)[*].imageTags[0]' --output json | grep -v "alpha" | grep -v "beta" | sort -r | awk 'NR==3{print $1}' | tr -d '"' | tr -d ',' | tr -d 'v')
+              image_tag=$(aws ecr describe-images --repository-name stackbill-billing --query 'sort_by(imageDetails,& imagePushedAt)[*].imageTags[0]' --output json | grep -v "alpha" | grep -v "beta" | sort -r | awk 'NR==2{print $1}' | tr -d '"' | tr -d ',' | tr -d 'v')
               if [ "$release_type" = "Major" ]; then
                 i=`echo $image_tag | awk "{print $1}" | cut -d"." -f1`
                 j=0
