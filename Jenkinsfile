@@ -117,6 +117,7 @@ pipeline {
           aws configure set aws_secret_access_key ${AWS_SECRET_KEY}
           aws configure set region ${AWS_REGION}
           aws ecr get-login-password --region ${AWS_REGION} | podman login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+          ### Pushing Core Image to ECR ###
           if [ "$repo_name" = "core" ]; then
             if [ "$branch_name" = "stable" ]; then
               image_tag=$(aws ecr describe-images --repository-name stackbill-coreapi --query 'sort_by(imageDetails,& imagePushedAt)[*].imageTags[0]' | grep -v "alpha" | grep -v "beta" | sort -r | awk 'NR==3{print $1}' | tr -d '"' | tr -d ',' | tr -d 'v')
@@ -229,6 +230,123 @@ pipeline {
                 new_tag=v$i.$j.$k
                 podman tag ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-coreapi:latest ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-coreapi:$new_tag-beta
                 podman push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-coreapi:$new_tag-beta
+              fi
+            fi
+          fi
+
+          ### Pushing Billing Image to ECR ###
+          if [ "$repo_name" = "billing" ]; then
+            if [ "$branch_name" = "stable" ]; then
+              image_tag=$(aws ecr describe-images --repository-name stackbill-billing --query 'sort_by(imageDetails,& imagePushedAt)[*].imageTags[0]' | grep -v "alpha" | grep -v "beta" | sort -r | awk 'NR==3{print $1}' | tr -d '"' | tr -d ',' | tr -d 'v')
+              if [ "$release_type" = "Major" ]; then
+                i=`echo $image_tag | awk "{print $1}" | cut -d"." -f1`
+                j=0
+                k=0
+                i=$(expr $i + 1)
+                new_tag=v$i.$j.$k
+                podman tag ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-billing:latest ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-billing:$new_tag
+                podman push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-billing:$new_tag
+              elif [ "$release_type" = "Minor" ]; then
+                i=`echo $image_tag | awk "{print $1}" | cut -d"." -f1`
+                j=`echo $image_tag | awk "{print $1}" | cut -d"." -f2`
+                k=0
+                if [ "$j" -gt 1000 ]; then
+                  j=0
+                  i=$(expr $i + 1)
+                else
+                  j=$(expr $j + 1)
+                fi
+                new_tag=v$i.$j.$k
+                podman tag ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-billing:latest ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-billing:$new_tag
+                podman push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-billing:$new_tag
+              elif [ "$release_type" = "Patch" ]; then
+                i=`echo $image_tag | awk "{print $1}" | cut -d "." -f1`
+                j=`echo $image_tag | awk "{print $1}" | cut -d "." -f2`
+                k=`echo $image_tag | awk "{print $1}" | cut -d "." -f3`
+                if [ "$k" -gt 20 ]; then
+                  exit;
+                else
+                  k=$(expr $k + 1)
+                fi
+                new_tag=v$i.$j.$k
+                podman tag ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-billing:latest ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-billing:$new_tag
+                podman push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-billing:$new_tag
+              fi
+            fi
+
+            if [ "$branch_name" = "development" ]; then
+              image_tag=$(aws ecr describe-images --repository-name stackbill-billing --query 'sort_by(imageDetails,& imagePushedAt)[*].imageTags[0]' | grep "alpha" | sort -r | awk 'NR==1{print $1}' | tr -d '"' | tr -d ',' | tr -d 'v' | tr -d 'alpha' | tr -d '-')
+              if [ "$release_type" = "Major" ]; then
+                i=`echo $image_tag | awk "{print $1}" | cut -d"." -f1`
+                j=0
+                k=0
+                i=$(expr $i + 1)
+                new_tag=v$i.$j.$k
+                podman tag ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-billing:latest ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-billing:$new_tag-alpha
+                podman push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-billing:$new_tag-alpha
+              elif [ "$release_type" = "Minor" ]; then
+                i=`echo $image_tag | awk "{print $1}" | cut -d"." -f1`
+                j=`echo $image_tag | awk "{print $1}" | cut -d"." -f2`
+                k=0
+                if [ "$j" -gt 1000 ]; then
+                  j=0
+                  i=$(expr $i + 1)
+                else
+                  j=$(expr $j + 1)
+                fi
+                new_tag=v$i.$j.$k
+                podman tag ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-billing:latest ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-billing:$new_tag-alpha
+                podman push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-billing:$new_tag-alpha
+              elif [ "$release_type" = "Patch" ]; then
+                i=`echo $image_tag | awk "{print $1}" | cut -d "." -f1`
+                j=`echo $image_tag | awk "{print $1}" | cut -d "." -f2`
+                k=`echo $image_tag | awk "{print $1}" | cut -d "." -f3`
+                if [ "$k" -gt 20 ]; then
+                  exit;
+                else
+                  k=$(expr $k + 1)
+                fi
+                new_tag=v$i.$j.$k
+                podman tag ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-billing:latest ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-billing:$new_tag-alpha
+                podman push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-billing:$new_tag-alpha
+              fi
+            fi
+
+            if [ "$branch_name" = "pre-stable" ]; then
+              image_tag=$(aws ecr describe-images --repository-name stackbill-billing --query 'sort_by(imageDetails,& imagePushedAt)[*].imageTags[0]' | grep "beta" | sort -r | awk 'NR==1{print $1}' | tr -d '"' | tr -d ',' | tr -d 'v' | tr -d 'beta' | tr -d '-')
+              if [ "$release_type" = "Major" ]; then
+                i=`echo $image_tag | awk "{print $1}" | cut -d"." -f1`
+                j=0
+                k=0
+                i=$(expr $i + 1)
+                new_tag=v$i.$j.$k
+                podman tag ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-billing:latest ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-billing:$new_tag-beta
+                podman push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-billing:$new_tag-beta
+              elif [ "$release_type" = "Minor" ]; then
+                i=`echo $image_tag | awk "{print $1}" | cut -d"." -f1`
+                j=`echo $image_tag | awk "{print $1}" | cut -d"." -f2`
+                k=0
+                if [ "$j" -gt 1000 ]; then
+                  j=0
+                  i=$(expr $i + 1)
+                else
+                  j=$(expr $j + 1)
+                fi
+                new_tag=v$i.$j.$k
+                podman tag ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-billing:latest ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-billing:$new_tag-beta
+                podman push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-billing:$new_tag-beta
+              elif [ "$release_type" = "Patch" ]; then
+                i=`echo $image_tag | awk "{print $1}" | cut -d "." -f1`
+                j=`echo $image_tag | awk "{print $1}" | cut -d "." -f2`
+                k=`echo $image_tag | awk "{print $1}" | cut -d "." -f3`
+                if [ "$k" -gt 20 ]; then
+                  exit;
+                else
+                  k=$(expr $k + 1)
+                fi
+                new_tag=v$i.$j.$k
+                podman tag ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-billing:latest ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-billing:$new_tag-beta
+                podman push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-billing:$new_tag-beta
               fi
             fi
           fi
