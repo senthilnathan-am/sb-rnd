@@ -157,7 +157,7 @@ pipeline {
             fi
 
             if [ "$branch_name" = "development" ]; then
-              image_tag=$(aws ecr describe-images --repository-name stackbill-coreapi --query 'sort_by(imageDetails,& imagePushedAt)[*].imageTags[0]' | grep -v "alpha" | grep -v "beta" | sort -r | awk 'NR==3{print $1}' | tr -d '"' | tr -d ',' | tr -d 'v')
+              image_tag=$(aws ecr describe-images --repository-name stackbill-coreapi --query 'sort_by(imageDetails,& imagePushedAt)[*].imageTags[0]' | grep "alpha" | sort -r | awk 'NR==1{print $1}' | tr -d '"' | tr -d ',' | tr -d 'v' | tr -d 'alpha-')
               if [ "$release_type" = "Major" ]; then
                 i=`echo $image_tag | awk "{print $1}" | cut -d"." -f1`
                 j=0
@@ -195,7 +195,7 @@ pipeline {
             fi
 
             if [ "$branch_name" = "pre-stable" ]; then
-              image_tag=$(aws ecr describe-images --repository-name stackbill-coreapi --query 'sort_by(imageDetails,& imagePushedAt)[*].imageTags[0]' | grep -v "alpha" | grep -v "beta" | sort -r | awk 'NR==3{print $1}' | tr -d '"' | tr -d ',' | tr -d 'v')
+              image_tag=$(aws ecr describe-images --repository-name stackbill-coreapi --query 'sort_by(imageDetails,& imagePushedAt)[*].imageTags[0]' | grep "beta" | sort -r | awk 'NR==1{print $1}' | tr -d '"' | tr -d ',' | tr -d 'v' | tr -d 'beta-')
               if [ "$release_type" = "Major" ]; then
                 i=`echo $image_tag | awk "{print $1}" | cut -d"." -f1`
                 j=0
