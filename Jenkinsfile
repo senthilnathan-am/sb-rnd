@@ -119,8 +119,40 @@ pipeline {
           aws ecr get-login-password --region ${AWS_REGION} | podman login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
           if [ "$repo_name" = "Core" ]; then
             if [ "$branch_name" = "stable" ]; then
+              image_tag=$(aws ecr describe-images --repository-name stackbill-coreapi --query 'sort_by(imageDetails,& imagePushedAt)[*].imageTags[0]' | grep -v "alpha" | grep -v "beta" | awk 'NR==2{print $1}' | tr -d '"' | tr -d ',' | tr -d 'v')
               if [ "$release_type" = "Major" ]; then
-                image_tag=$(aws ecr describe-images --repository-name stackbill-coreapi --query 'sort_by(imageDetails,& imagePushedAt)[*].imageTags[0]' | grep -v "alpha" | grep -v "beta" | awk 'NR==2{print $1}' | tr -d '"' | tr -d ',' | tr -d 'v')
+                i=`echo $image_tag | awk "{print $1}" | cut -d"." -f1`
+                j=0
+                k=0
+                i=$(expr $i + 1)
+                new_tag=v$i.$j.$k
+                podman tag ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-coreapi:latest ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-coreapi:$new_tag
+                podman push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-coreapi:$new_tag
+              elif [ "$release_type" = "Minor" ]; then
+                i=`echo $image_tag | awk "{print $1}" | cut -d"." -f1`
+                j=`echo $image_tag | awk "{print $1}" | cut -d"." -f2`
+                k=0
+                if [ "$j" -gt 1000 ]; then
+                  j=0
+                  i=$(expr $i + 1)
+                else
+                  j=$(expr $j + 1)
+                fi
+                new_tag=v$i.$j.$k
+                podman tag ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-coreapi:latest ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-coreapi:$new_tag
+                podman push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-coreapi:$new_tag
+              elif [ "$release_type" = "Patch" ]; then
+                i=`echo $image_tag | awk "{print $1}" | cut -d "." -f1`
+                j=`echo $image_tag | awk "{print $1}" | cut -d "." -f2`
+                k=`echo $image_tag | awk "{print $1}" | cut -d "." -f3`
+                if [ "$k" -gt 20 ]; then
+                  exit;
+                else
+                  k=$(expr $k + 1)
+                fi
+                new_tag=v$i.$j.$k
+                podman tag ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-coreapi:latest ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-coreapi:$new_tag
+                podman push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/stackbill-coreapi:$new_tag
               fi
             fi
           fi
